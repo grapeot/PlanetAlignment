@@ -30,7 +30,7 @@ The project uses several key algorithms to analyze and visualize planetary align
    - Scores alignments based on three components:
      - Number of aligned planets (40% weight)
      - Quality of alignment (perpendicular distance to best-fit line, 30% weight)
-     - Concentration around the ecliptic (latitude dispersion, 30% weight)
+     - Concentration in longitude (longitude dispersion, 30% weight)
 
 3. **Visibility Analysis**
    - Calculates sunrise and sunset times for Beijing
