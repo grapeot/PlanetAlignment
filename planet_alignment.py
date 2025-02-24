@@ -292,7 +292,7 @@ def calculate_alignment_score(positions):
     The score is weighted as follows:
     - 40% based on the absolute number of aligned planets (max 7)
     - 30% based on how well they are aligned (perpendicular distance to line)
-    - 30% based on how concentrated they are around the ecliptic (latitude range)
+    - 30% based on how concentrated they are in longitude (longitude range)
     """
     # Extract coordinates (already centered)
     lons = np.array([lon for lon, _ in positions.values()])
@@ -337,16 +337,19 @@ def calculate_alignment_score(positions):
         mean_distance = np.mean(inlier_distances) if len(inlier_distances) > 0 else 10.0
         distance_score = 100 * (1 - min(mean_distance / 10.0, 1.0))
         
-        # 3. Latitude range score (30% weight)
-        # Calculate the range of ecliptic latitudes for inlier planets
-        # Score is best (100) when all planets are within ±5° of ecliptic
-        # Score decreases linearly to 0 when range reaches ±10°
-        inlier_lats = lats[inlier_mask]
-        lat_range = np.ptp(inlier_lats) if len(inlier_lats) > 0 else 20.0
-        lat_range_score = 100 * (1 - min(lat_range / 20.0, 1.0))
+        # 3. Longitude range score (30% weight)
+        # Calculate the range of ecliptic longitudes for inlier planets
+        # Score is best (100) when all planets are within 60° range
+        # Score decreases linearly to 0 when range reaches 120°
+        inlier_lons = lons[inlier_mask]
+        # Handle the case where longitudes cross the 180/-180 boundary
+        lon_diffs = np.abs(np.subtract.outer(inlier_lons, inlier_lons))
+        lon_diffs = np.minimum(lon_diffs, 360 - lon_diffs)
+        lon_range = np.max(lon_diffs) if len(inlier_lons) > 0 else 120.0
+        lon_range_score = 100 * (1 - min(lon_range / 120.0, 1.0))
         
         # Combine scores with weights
-        final_score = 0.4 * inlier_score + 0.3 * distance_score + 0.3 * lat_range_score
+        final_score = 0.4 * inlier_score + 0.3 * distance_score + 0.3 * lon_range_score
         
         # Generate line points for visualization
         extension = 20  # degrees
