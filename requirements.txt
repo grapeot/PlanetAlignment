@@ -1,0 +1,6 @@
+skyfield>=1.46.0
+numpy>=1.24.0
+matplotlib>=3.8.0
+moviepy==1.0.3
+tqdm>=4.66.0
+scikit-learn>=1.3.0
